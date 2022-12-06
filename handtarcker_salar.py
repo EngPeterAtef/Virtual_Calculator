@@ -15,7 +15,7 @@ cap = cv2.VideoCapture(0)
 
 mpHands = mp.solutions.hands
 hands = mpHands.Hands()
-mpDraw = mp.solutions.drawing_utils
+
 tipIds = [4, 8, 12, 16, 20]
 keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
         ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";"],
@@ -60,45 +60,15 @@ while True:
 
    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-   results = hands.process(imgRGB)
+   results = hands.process(imgRGB) # TBD
    img = drawAll(img, buttonList)
 
    lmList = []
 
    if results.multi_hand_landmarks:
-      for handLms in results.multi_hand_landmarks:
-         for id, lm in enumerate(handLms.landmark):
-            h, w, c = img.shape
-            cx, cy = int(lm.x * w), int(lm.y * h)
-            lmList.append([id, cx, cy])
-            mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
-            
-
-            if id == 8:
-               cv2.circle(img, (cx, cy), 20, (0, 255, 0), cv2.FILLED)
-
-            if len(lmList) == 21:
-               fingers = []
-
-               if lmList[tipIds[0]][1] < lmList[tipIds[0] - 2][1]:
-                  fingers.append(1)
-               else:
-                  fingers.append(0)
-
-               for tip in range(1, 5):
-                  if lmList[tipIds[tip]][2] < lmList[tipIds[tip] - 2][2]:
-                     fingers.append(1)
-                  else:
-                     fingers.append(0)
-
-               totalFingers = fingers.count(1)
-               # print(totalFingers)
-               # cv2.putText(img, f'{totalFingers}', (40, 80), cv2.FONT_HERSHEY_SIMPLEX,
-               # 3, (0, 0, 255), 6)
-   # print(lmList)
       hand = results.multi_hand_landmarks[0].landmark
-      x1 = hand[8].x*1000
-      x2 = hand[12].x*1000
+      x1 = hand[8].x*1000 # tarf awel soba3
+      x2 = hand[12].x*1000 # tarf tany soba3
       y1 = hand[8].y*600
       y2 = hand[12].y*600
       distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
