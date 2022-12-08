@@ -33,7 +33,30 @@ def show_images(images, titles=None):
     plt.show()
 
 
+# Position of ROI of hand thresholding
+top, right, bottom, left = 350, 690, 565, 930
+# Change the resolution of video
+# cap = cv2.VideoCapture(0,  apiPreference=cv2.CAP_ANY, params=[
+#     cv2.CAP_PROP_FRAME_WIDTH, 1024,
+#     cv2.CAP_PROP_FRAME_HEIGHT, 768])
 cap = cv2.VideoCapture(0)
+
+
+def getThresholdedHand(frame, roi):
+    global top, right, bottom, left
+    # ret, frame = cap.read()
+    # frame = cv2.flip(frame, 1)
+    # roi = frame[top:bottom, right:left]
+    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+    roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    roi = cv2.GaussianBlur(roi, (17, 17), 0)
+    roi_copy = roi.copy()
+    et, thresh1 = cv2.threshold(
+        roi, 127, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    # cv2.imshow('fframe', frame)
+    cv2.imshow('Hand threshold', thresh1)
+    return thresh1
+
 
 mpHands = mp.solutions.hands
 hands = mpHands.Hands()
@@ -80,13 +103,13 @@ def checkIfClickedOnKeyboard(x_finger, y_finger):
     return ''
 
 
+# ----------------------MEAN SHIFT INITIALIZATION--------------------
 # take first frame of the video
 ret, frame = cap.read()
-
 # setup initial location of window
 x, y, w, h = 0, 0, 300, 400  # simply hardcoded the values
 track_window = (x, y, w, h)
-# set up the ROI for tracking
+# set up the ROI for tracking in MeanShift
 roi = frame[y:y+h, x:x+w]
 hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 mask = cv2.inRange(hsv_roi, np.array((0., 60., 32.)),
@@ -96,44 +119,50 @@ cv2.normalize(roi_hist, roi_hist, 0, 255, cv2.NORM_MINMAX)
 # Setup the termination criteria, either 10 iteration or move by at least 1 pt
 term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
 
+# ----------------MAIN LOOP---------------
 while True:
+    # READ FRAME
     success, img = cap.read()
     img = cv2.resize(img, (1000, 600))
     img = cv2.flip(img, 1)
-
+    # TRANSFORM TO RGB
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # GET HANDS USING MEDIAPEP
+    results = hands.process(imgRGB)
+    # ----------------------------------------
+    # ---------------MEAN SHIFT---------------
+    # ----------------------------------------
+    # if success == True:
+    #     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    #     dst = cv2.calcBackProject([hsv], [0], roi_hist, [0, 180], 1)
 
-    results = hands.process(imgRGB)  # TBD
-
-    lmList = []
-    if success == True:
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        dst = cv2.calcBackProject([hsv], [0], roi_hist, [0, 180], 1)
-        # apply meanshift to get the new location
-        ret, track_window = cv2.meanShift(dst, track_window, term_crit)
-        # ret, track_window = cv2.CamShift(dst, track_window, term_crit)
-        # Draw it on image
-
-        # Draw it on image
-        # pts = cv2.boxPoints(ret)
-        # pts = np.int0(pts)
-        # img = cv2.polylines(img, [pts], True, 255, 2)
-
-        x, y, w, h = track_window
-        img = cv2.rectangle(img, (x, y), (x+w, y+h), 255, 2)
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:
-            break
-    else:
-        break
-
+    #     # -----------apply meanshift to get the new location-----------
+    #     ret, track_window = cv2.meanShift(dst, track_window, term_crit)
+    #     # -----------apply CamShift to get the new location-----------
+    #     # ret, track_window = cv2.CamShift(dst, track_window, term_crit)
+    #     # Draw it on image
+    #     # pts = cv2.boxPoints(ret)
+    #     # pts = np.int0(pts)
+    #     # img = cv2.polylines(img, [pts], True, 255, 2)
+    #     x, y, w, h = track_window
+    #     img = cv2.rectangle(img, (x, y), (x+w, y+h), 255, 2)
+    #     k = cv2.waitKey(30) & 0xff
+    #     if k == 27:
+    #         break
+    # else:
+    #     break
+    # Region of interest to be used for hand thresholding
+    roiForHandThresholding = img[top:bottom, right:left]
+    getThresholdedHand(img, roiForHandThresholding)
+    # -------------Draw Keyboard-----------
     img = drawAll(img, buttonList)
+    # -------Calculate distance between fingers to check if clicked-----------
     if results.multi_hand_landmarks:
         hand = results.multi_hand_landmarks[0].landmark
-        x1 = hand[8].x*1000  # tarf awel soba3
-        x2 = hand[12].x*1000  # tarf tany soba3
-        y1 = hand[8].y*600
-        y2 = hand[12].y*600
+        x1 = hand[8].x * 1000  # tarf awel soba3
+        x2 = hand[12].x * 1000  # tarf tany soba3
+        y1 = hand[8].y * 600
+        y2 = hand[12].y * 600
         distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
         # print(distance)
         if distance < 60:
@@ -145,11 +174,12 @@ while True:
             cv2.putText(img, 'Not clicked', (40, 80), cv2.FONT_HERSHEY_SIMPLEX,
                         3, (0, 0, 255), 6)
 
-    # print the text on screen
-    cv2.rectangle(img, (50, 450), (1000, 550), (175, 0, 175), cv2.FILLED)
+    # ----------Draw rectangle that contains the output word---------
+    cv2.rectangle(img, (50, 450), (600, 550), (175, 0, 175), cv2.FILLED)
     cv2.putText(img, finalText, (60, 500),
                 cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 255), 3)
 
+    # ----------Draw output frame---------
     cv2.imshow('Hand Tracker', img)
     cv2.waitKey(1)
     if cv2.waitKey(5) & 0xff == 27:

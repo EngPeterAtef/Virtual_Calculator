@@ -66,7 +66,7 @@ while (True):
     et, thresh1 = cv2.threshold(
         roi, 127, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 
-    im2, contours, hierarchy = cv2.findContours(
+    contours, hierarchy = cv2.findContours(
         thresh1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     max_cnt = max(contours, key=cv2.contourArea)
 
