@@ -82,6 +82,7 @@ def checkIfClickedOnKeyboard(x_finger, y_finger):
 
 # take first frame of the video
 ret, frame = cap.read()
+
 # setup initial location of window
 x, y, w, h = 0, 0, 300, 400  # simply hardcoded the values
 track_window = (x, y, w, h)
@@ -110,7 +111,14 @@ while True:
         dst = cv2.calcBackProject([hsv], [0], roi_hist, [0, 180], 1)
         # apply meanshift to get the new location
         ret, track_window = cv2.meanShift(dst, track_window, term_crit)
+        # ret, track_window = cv2.CamShift(dst, track_window, term_crit)
         # Draw it on image
+
+        # Draw it on image
+        # pts = cv2.boxPoints(ret)
+        # pts = np.int0(pts)
+        # img = cv2.polylines(img, [pts], True, 255, 2)
+
         x, y, w, h = track_window
         img = cv2.rectangle(img, (x, y), (x+w, y+h), 255, 2)
         k = cv2.waitKey(30) & 0xff
