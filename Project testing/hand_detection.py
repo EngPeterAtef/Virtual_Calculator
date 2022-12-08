@@ -10,6 +10,22 @@ from time import sleep
 from pynput.keyboard import Controller
 from cvzone.HandTrackingModule import HandDetector
 import math
+import pandas as pd
+
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# ----------DONT DELETE ANY COMMENT FROM THIS FILE!!!!!!!!!!-----------------
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Structure element path
+# path1 = "D:/Engineering/CUFE/3rd Year (Computer) (2022)/First Semester/Image Processing/Projects/Virtual_Keyboard/Project testing"
+# structure_element = pd.read_excel(path1 + '/stel20x20.xlsx')
+# structure_element = structure_element.to_numpy()
+# print(structure_element.max())
 
 
 def show_images(images, titles=None):
@@ -44,16 +60,21 @@ cap = cv2.VideoCapture(0)
 
 def getThresholdedHand(frame, roi):
     global top, right, bottom, left
-    # ret, frame = cap.read()
-    # frame = cv2.flip(frame, 1)
-    # roi = frame[top:bottom, right:left]
+    # Draw rectangle to indicate the area in which we initialize hand positon for the first time
     cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
+    # Convert to gray scale
     roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    # Gaussiam filter
     roi = cv2.GaussianBlur(roi, (17, 17), 0)
-    roi_copy = roi.copy()
+    # Threshold
     et, thresh1 = cv2.threshold(
         roi, 127, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-    # cv2.imshow('fframe', frame)
+    # -------------Skeletonize------------
+    # thresh1 = skeletonize(thresh1/255)
+    # ---------------erosion--------------
+    # erosion = binary_erosion(thresh1, structure_element)
+    # thresh1 = thresh1 - erosion.astype(np.uint8) * 255
+    # Show hand
     cv2.imshow('Hand threshold', thresh1)
     return thresh1
 
@@ -119,7 +140,9 @@ cv2.normalize(roi_hist, roi_hist, 0, 255, cv2.NORM_MINMAX)
 # Setup the termination criteria, either 10 iteration or move by at least 1 pt
 term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
 
+# ----------------------------------------
 # ----------------MAIN LOOP---------------
+# ----------------------------------------
 while True:
     # READ FRAME
     success, img = cap.read()
@@ -151,12 +174,17 @@ while True:
     #         break
     # else:
     #     break
+    # ----------------------------------------------------
+    # ---------------HANDS THRSHOLDING--------------------
+    # ----------------------------------------------------
     # Region of interest to be used for hand thresholding
     roiForHandThresholding = img[top:bottom, right:left]
     getThresholdedHand(img, roiForHandThresholding)
-    # -------------Draw Keyboard-----------
+    # -----------------Draw Keyboard----------------------
     img = drawAll(img, buttonList)
+    # ------------------------------------------------------------------------
     # -------Calculate distance between fingers to check if clicked-----------
+    # ------------------------------------------------------------------------
     if results.multi_hand_landmarks:
         hand = results.multi_hand_landmarks[0].landmark
         x1 = hand[8].x * 1000  # tarf awel soba3
@@ -179,7 +207,7 @@ while True:
     cv2.putText(img, finalText, (60, 500),
                 cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 255), 3)
 
-    # ----------Draw output frame---------
+    # --------------------Draw output frame--------------------------
     cv2.imshow('Hand Tracker', img)
     cv2.waitKey(1)
     if cv2.waitKey(5) & 0xff == 27:
