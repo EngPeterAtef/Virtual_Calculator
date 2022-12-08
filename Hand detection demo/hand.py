@@ -15,8 +15,9 @@ def weightedaverage(image):
         ret, frame = cap.read()
         frame = cv2.flip(frame, 1)
         roi = frame[top:bottom, right:left]
-
+        # Convert to greyscale
         roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        # Gaussian filter 17*17
         roi = cv2.GaussianBlur(roi, (17, 17), 0)
 
         cv2.accumulateWeighted(roi, bg, 0.5)
