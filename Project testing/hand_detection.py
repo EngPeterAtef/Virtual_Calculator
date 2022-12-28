@@ -59,9 +59,11 @@ top, right, bottom, left = 350, 690, 565, 930
 #     cv2.CAP_PROP_FRAME_HEIGHT, 768])
 cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
-index = 1
+index = 501
 capture = False
 path = "E:/Koleya/3rd/image project last/captured/8/"
+
+
 def getThresholdedHand(frame, roi):
     global top, right, bottom, left, index, capture
     # Draw rectangle to indicate the area in which we initialize hand positon for the first time
@@ -235,7 +237,8 @@ while True:
     #                     3, (0, 0, 255), 6)
 
     # ---------------------DRAW GESTURE PREDICTION-------------------------
-    cv2.putText(img, f'{result[0]}', (40, 80), cv2.FONT_HERSHEY_SIMPLEX,3, (0, 0, 255), 6)
+    cv2.putText(img, f'{result[0]}', (40, 80),
+                cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 6)
     # ----------Draw rectangle that contains the output word---------
     # cv2.rectangle(img, (50, 450), (600, 550), (175, 0, 175), cv2.FILLED)
     # cv2.putText(img, finalText, (60, 500),
