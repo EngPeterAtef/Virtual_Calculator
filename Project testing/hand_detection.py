@@ -52,16 +52,16 @@ def show_images(images, titles=None):
 
 
 # Position of ROI of hand thresholding
-top, right, bottom, left = 350, 690, 565, 930
+top, right, bottom, left = 350, 90, 565, 330
 # Change the resolution of video
 # cap = cv2.VideoCapture(0,  apiPreference=cv2.CAP_ANY, params=[
 #     cv2.CAP_PROP_FRAME_WIDTH, 1024,
 #     cv2.CAP_PROP_FRAME_HEIGHT, 768])
 cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
-index = 1
+index = 501
 capture = False
-path = "E:/Koleya/3rd/image project last/captured/8/"
+path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/data set/0"
 def getThresholdedHand(frame, roi):
     global top, right, bottom, left, index, capture
     # Draw rectangle to indicate the area in which we initialize hand positon for the first time
@@ -71,8 +71,9 @@ def getThresholdedHand(frame, roi):
     # Gaussiam filter
     roi = cv2.GaussianBlur(roi, (17, 17), 0)
     # Threshold
-    et, thresh1 = cv2.threshold(
-        roi, 127, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    # et, thresh1 = cv2.threshold(
+    #     roi, 127, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    thresh1 = cv2.adaptiveThreshold(roi,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY, 199, 5)
     # -------------Skeletonize------------
     # thresh1 = skeletonize(thresh1/255)
     # ---------------erosion--------------
