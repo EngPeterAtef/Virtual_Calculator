@@ -18,10 +18,6 @@ y = []
 y.append(1)
 
 for g in range(9):
-    # if g == 0:
-    #     path = "D:/Engineering/CUFE/3rd Year (Computer) (2022)/First Semester/Image Processing/Projects/Training set/2/"
-    # else:
-    #     path = "D:/Engineering/CUFE/3rd Year (Computer) (2022)/First Semester/Image Processing/Projects/Training set/13/"
     for i in range(2, 501):
         # Read image
         img = cv.imread(path + f'{g}/{i}.jpg')
@@ -49,7 +45,6 @@ np.random.seed(0)
 k_means = cluster.KMeans(n_clusters=n_clusters, n_init=4)
 k_means.fit(feature_set)
 # Produce "bag of words" histogram for each image
-# k = 0
 print(f"Success")
 print(f"Generating bag of words...")
 for descriptor in descriptors:
@@ -58,11 +53,6 @@ for descriptor in descriptors:
     for feature in descriptor:
         vq[feature] = vq[feature] + 1
     bagOfWords.append(vq)
-    # if k < 100:
-    #     y.append(2)
-    # else:
-    #     y.append(13)
-    # k = k + 1
 
 print(f"Success")
 print(f"Training SVM model...")

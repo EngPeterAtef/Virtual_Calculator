@@ -58,6 +58,7 @@ top, right, bottom, left = 350, 690, 565, 930
 #     cv2.CAP_PROP_FRAME_WIDTH, 1024,
 #     cv2.CAP_PROP_FRAME_HEIGHT, 768])
 cap = cv2.VideoCapture(0)
+# --------------------Capture dataset---------------------
 index = 1
 capture = False
 path = "E:/Koleya/3rd/image project last/captured/8/"
@@ -246,3 +247,5 @@ while True:
     if cv2.waitKey(1) & 0xff == ord('s'):
         capture = True
         # break
+    if cv2.waitKey(1) & 0xff == 27:
+        break
