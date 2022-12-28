@@ -11,6 +11,8 @@ from pynput.keyboard import Controller
 from cvzone.HandTrackingModule import HandDetector
 import math
 import pandas as pd
+import pickle
+import os
 
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -56,10 +58,11 @@ top, right, bottom, left = 350, 690, 565, 930
 #     cv2.CAP_PROP_FRAME_WIDTH, 1024,
 #     cv2.CAP_PROP_FRAME_HEIGHT, 768])
 cap = cv2.VideoCapture(0)
-
-
+index = 1
+capture = False
+path = "E:/Koleya/3rd/image project last/captured/8/"
 def getThresholdedHand(frame, roi):
-    global top, right, bottom, left
+    global top, right, bottom, left, index, capture
     # Draw rectangle to indicate the area in which we initialize hand positon for the first time
     cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
     # Convert to gray scale
@@ -68,7 +71,7 @@ def getThresholdedHand(frame, roi):
     roi = cv2.GaussianBlur(roi, (17, 17), 0)
     # Threshold
     et, thresh1 = cv2.threshold(
-        roi, 127, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        roi, 127, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     # -------------Skeletonize------------
     # thresh1 = skeletonize(thresh1/255)
     # ---------------erosion--------------
@@ -76,6 +79,10 @@ def getThresholdedHand(frame, roi):
     # thresh1 = thresh1 - erosion.astype(np.uint8) * 255
     # Show hand
     cv2.imshow('Hand threshold', thresh1)
+    if capture:
+        cv2.imwrite(os.path.join(path, f'{index}.jpg'), thresh1)
+        print(index)
+        index = index + 1
     return thresh1
 
 
@@ -124,6 +131,14 @@ def checkIfClickedOnKeyboard(x_finger, y_finger):
     return ''
 
 
+# -----------------------------LOAD MODELS---------------------------
+# Load kmeans model
+filename1 = 'kmeans_model.sav'
+k_means = pickle.load(open(filename1, 'rb'))
+n_clusters = 1600
+# Load SVM model
+filename2 = 'gestures_model.sav'
+clf = pickle.load(open(filename2, 'rb'))
 # ----------------------MEAN SHIFT INITIALIZATION--------------------
 # take first frame of the video
 ret, frame = cap.read()
@@ -151,7 +166,7 @@ while True:
     # TRANSFORM TO RGB
     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     # GET HANDS USING MEDIAPEP
-    results = hands.process(imgRGB)
+    # results = hands.process(imgRGB)
     # ----------------------------------------
     # ---------------MEAN SHIFT---------------
     # ----------------------------------------
@@ -179,36 +194,55 @@ while True:
     # ----------------------------------------------------
     # Region of interest to be used for hand thresholding
     roiForHandThresholding = img[top:bottom, right:left]
-    getThresholdedHand(img, roiForHandThresholding)
+    thres = getThresholdedHand(img, roiForHandThresholding)
+    # ----------------------------------------------------
+    # ----------------GESTURE PREDICTION------------------
+    # ----------------------------------------------------
+    # Feature extraction
+    sift = cv2.SIFT_create()
+    kp, descriptor = sift.detectAndCompute(thres, None)
+    if descriptor is None:
+        continue
+    else:
+        # Produce "bag of words" vector
+        descriptor = k_means.predict(descriptor)
+        vq = [0] * n_clusters
+        for feature in descriptor:
+            vq[feature] = vq[feature] + 1  # load the model from disk
+        # Predict the result
+        result = clf.predict([vq])
     # -----------------Draw Keyboard----------------------
-    img = drawAll(img, buttonList)
+    # img = drawAll(img, buttonList)
     # ------------------------------------------------------------------------
     # -------Calculate distance between fingers to check if clicked-----------
     # ------------------------------------------------------------------------
-    if results.multi_hand_landmarks:
-        hand = results.multi_hand_landmarks[0].landmark
-        x1 = hand[8].x * 1000  # tarf awel soba3
-        x2 = hand[12].x * 1000  # tarf tany soba3
-        y1 = hand[8].y * 600
-        y2 = hand[12].y * 600
-        distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-        # print(distance)
-        if distance < 60:
-            cv2.putText(img, 'Clicked', (40, 80), cv2.FONT_HERSHEY_SIMPLEX,
-                        3, (0, 0, 255), 6)
-            finalText += checkIfClickedOnKeyboard((x1+x2)//2, (y1+y2)//2)
-            sleep(0.15)
-        else:
-            cv2.putText(img, 'Not clicked', (40, 80), cv2.FONT_HERSHEY_SIMPLEX,
-                        3, (0, 0, 255), 6)
+    # if results.multi_hand_landmarks:
+    #     hand = results.multi_hand_landmarks[0].landmark
+    #     x1 = hand[8].x * 1000  # tarf awel soba3
+    #     x2 = hand[12].x * 1000  # tarf tany soba3
+    #     y1 = hand[8].y * 600
+    #     y2 = hand[12].y * 600
+    #     distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+    #     # print(distance)
+    #     if distance < 60:
+    #         cv2.putText(img, 'Clicked', (40, 80), cv2.FONT_HERSHEY_SIMPLEX,
+    #                     3, (0, 0, 255), 6)
+    #         finalText += checkIfClickedOnKeyboard((x1+x2)//2, (y1+y2)//2)
+    #         sleep(0.15)
+    #     else:
+    #         cv2.putText(img, 'Not clicked', (40, 80), cv2.FONT_HERSHEY_SIMPLEX,
+    #                     3, (0, 0, 255), 6)
 
+    # ---------------------DRAW GESTURE PREDICTION-------------------------
+    cv2.putText(img, f'{result[0]}', (40, 80), cv2.FONT_HERSHEY_SIMPLEX,3, (0, 0, 255), 6)
     # ----------Draw rectangle that contains the output word---------
-    cv2.rectangle(img, (50, 450), (600, 550), (175, 0, 175), cv2.FILLED)
-    cv2.putText(img, finalText, (60, 500),
-                cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 255), 3)
+    # cv2.rectangle(img, (50, 450), (600, 550), (175, 0, 175), cv2.FILLED)
+    # cv2.putText(img, finalText, (60, 500),
+    #             cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 255), 3)
 
     # --------------------Draw output frame--------------------------
     cv2.imshow('Hand Tracker', img)
-    cv2.waitKey(1)
-    if cv2.waitKey(5) & 0xff == 27:
-        break
+    # cv2.waitKey(1)
+    if cv2.waitKey(1) & 0xff == ord('s'):
+        capture = True
+        # break
