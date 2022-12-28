@@ -7,7 +7,7 @@ from sklearn import cluster
 import pickle
 #waiiiiiiit at3amli nty 3la al lab!!!
 path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/data set/"
-img = cv.imread(path + '1/1.jpg')
+img = cv.imread(path + '0/1.jpg')
 sift = cv.SIFT_create()
 kp, descriptor = sift.detectAndCompute(img, None)
 feature_set = np.copy(descriptor)
@@ -16,9 +16,12 @@ descriptors.append(descriptor)
 bagOfWords = []
 y = []
 y.append(1)
-
-for g in range(0,2):
-    for i in range(2, 751):
+for g in range(0,3):
+    if g==0:
+        c = 2
+    else:
+        c=1
+    for i in range(c, 751):
         # Read image
         img = cv.imread(path + f'{g}/{i}.jpg')
         # Grayscale

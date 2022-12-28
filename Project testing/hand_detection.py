@@ -1,3 +1,4 @@
+import time
 import matplotlib.pyplot as plt
 import numpy as np
 import skimage.io as io
@@ -6,14 +7,13 @@ from skimage.morphology import binary_erosion, binary_dilation, binary_closing, 
 import cv2
 import mediapipe as mp
 import cvzone
-from time import sleep
 from pynput.keyboard import Controller
 from cvzone.HandTrackingModule import HandDetector
 import math
 import pandas as pd
 import pickle
 import os
-
+import threading
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -28,6 +28,33 @@ import os
 # structure_element = pd.read_excel(path1 + '/stel20x20.xlsx')
 # structure_element = structure_element.to_numpy()
 # print(structure_element.max())
+operand1= operation = operand2 =timer =  None
+inputsCount = 0
+finalResult = 0
+def fun():
+    print("callback func")
+    global operand1, operation, operand2 , timer,inputsCount,result,finalResult,start_time
+    if(inputsCount==0):
+        operand1 = int(result[0])
+    elif(inputsCount==1):
+        operation =int(result[0])
+    elif(inputsCount==2):
+        operand2 = int(result[0])
+
+    inputsCount = inputsCount +1 
+
+    print(f"operand1= {operand1}, operation = {operation}, operand2 = {operand2}" )
+    if(inputsCount!=3):
+        timer = threading.Timer(10,fun)
+        start_time = time.time()
+        timer.start()
+        # print ("Running for : %s seconds"%(time.time()-start_time))
+        print("after calling start_time.start()")
+    if(inputsCount==3):
+        print("count= 3 nowwwwwwwwww")
+        if(operation==2):
+            finalResult = operand1+ operand2
+            print("finalResult = ",finalResult)
 
 
 def show_images(images, titles=None):
@@ -157,10 +184,16 @@ cv2.normalize(roi_hist, roi_hist, 0, 255, cv2.NORM_MINMAX)
 # Setup the termination criteria, either 10 iteration or move by at least 1 pt
 term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
 
+
+timer = threading.Timer(10,fun)
+start_time = time.time()
+timer.start()
 # ----------------------------------------
 # ----------------MAIN LOOP---------------
 # ----------------------------------------
+print ("Running for : %s seconds"%(time.time()-start_time))
 while True:
+
     # READ FRAME
     success, img = cap.read()
     img = cv2.resize(img, (1000, 600))
@@ -236,7 +269,11 @@ while True:
     #                     3, (0, 0, 255), 6)
 
     # ---------------------DRAW GESTURE PREDICTION-------------------------
+    
     cv2.putText(img, f'{result[0]}', (40, 80), cv2.FONT_HERSHEY_SIMPLEX,3, (0, 0, 255), 6)
+    # cv2.putText(img, f'finalResult =  {finalResult}', (60, 100), cv2.FONT_HERSHEY_SIMPLEX,3, (0, 0, 255), 6)
+    
+    
     # ----------Draw rectangle that contains the output word---------
     # cv2.rectangle(img, (50, 450), (600, 550), (175, 0, 175), cv2.FILLED)
     # cv2.putText(img, finalText, (60, 500),
