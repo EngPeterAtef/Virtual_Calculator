@@ -59,7 +59,7 @@ top, right, bottom, left = 350, 90, 565, 330
 #     cv2.CAP_PROP_FRAME_HEIGHT, 768])
 cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
-index = 501
+index = 400
 capture = False
 path = "E:/Koleya/3rd/image project last/captured/8/"
 
