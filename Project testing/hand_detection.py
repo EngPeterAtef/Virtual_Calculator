@@ -278,10 +278,18 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 1):
         operation = int(result[0])
-        if operation == 2:
+        if operation == 6:
             operationStr = "+"
-        else:
-            operationStr = "None"
+        elif operation == 7:
+            operationStr = "-"
+        elif operation == 8:
+            operationStr = "*"
+        elif operation == 9:
+            operationStr = "/"
+        elif operation == 10:
+            operationStr = "^"
+        else:#default
+            operationStr = "+"
         cv2.putText(img, f'{operand1} {operationStr}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 2):
@@ -290,9 +298,20 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 3):
         # print("count = 3")
-        if(operation == 2):
+        if(operation == 6):
             finalResult = operand1 + operand2
-            print("finalResult = ", finalResult)
+        elif operation == 7:
+            finalResult = operand1 - operand2
+        elif operation == 8:
+            finalResult = operand1 * operand2
+        elif operation == 9:
+            finalResult = operand1 / operand2
+        elif operation == 10:
+            finalResult = operand1 ** operand2
+        else:#default
+            finalResult = operand1 + operand2
+
+        print("finalResult = ", finalResult)
         cv2.putText(img, f'{operand1} {operationStr} {operand2} = {finalResult}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 4):
