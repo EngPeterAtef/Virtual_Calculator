@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn import cluster
 import pickle
-#waiiiiiiit at3amli nty 3la al lab!!!
-path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/data set/"
+path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/Virtual_Keyboard/data set/"
 img = cv.imread(path + '0/1.jpg')
 sift = cv.SIFT_create()
 kp, descriptor = sift.detectAndCompute(img, None)
@@ -16,7 +15,7 @@ descriptors.append(descriptor)
 bagOfWords = []
 y = []
 y.append(1)
-for g in range(0,3):
+for g in range(0,11):
     if g==0:
         c = 2
     else:

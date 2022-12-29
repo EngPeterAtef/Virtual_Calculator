@@ -76,7 +76,7 @@ def show_images(images, titles=None):
 
 
 # Position of ROI of hand thresholding
-top, right, bottom, left = 350, 690, 565, 930
+top, right, bottom, left = 350, 90, 565, 330
 # Change the resolution of video
 # cap = cv2.VideoCapture(0,  apiPreference=cv2.CAP_ANY, params=[
 #     cv2.CAP_PROP_FRAME_WIDTH, 1024,
@@ -85,7 +85,7 @@ cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
 index = 501
 capture = False
-path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/data set/3"
+path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/Virtual_Keyboard/data set/"
 
 
 def getThresholdedHand(frame, roi):
