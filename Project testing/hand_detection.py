@@ -85,7 +85,7 @@ cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
 index = 450
 capture = False
-path = "E:/Koleya/3rd/image project last/captured/giza/"
+path = "E:/Koleya/3rd/image project last/captured/giza"
 
 
 def getThresholdedHand(frame, roi):
@@ -93,25 +93,41 @@ def getThresholdedHand(frame, roi):
     # Draw rectangle to indicate the area in which we initialize hand positon for the first time
     cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
     # Convert to gray scale
-    roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    # roi2 = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+    # if capture:
+    #     cv2.imwrite(os.path.join(path, f'{index}.jpg'), roi2)
+    #     print(index)
+    #     index = index + 1
+    # roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     # Gaussiam filter
-    roi = cv2.GaussianBlur(roi, (17, 17), 0)
+    # roi = cv2.GaussianBlur(roi, (17, 17), 0)
     # Threshold
     # et, thresh1 = cv2.threshold(
     #     roi, 127, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    thresh1 = cv2.adaptiveThreshold(
-        roi, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 51, 5)
-    # -------------Skeletonize------------
-    # thresh1 = skeletonize(thresh1/255)
-    # ---------------erosion--------------
-    # erosion = binary_erosion(thresh1, structure_element)
-    # thresh1 = thresh1 - erosion.astype(np.uint8) * 255
+    # thresh1 = cv2.adaptiveThreshold(
+    #     roi, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 5)
+
+    # define the upper and lower boundaries of the HSV pixel intensities
+    # to be considered 'skin'
+    hsvim = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+    lower = np.array([0, 48, 80], dtype="uint8")
+    upper = np.array([20, 255, 255], dtype="uint8")
+    skinMask = cv2.inRange(hsvim, lower, upper)
+
+    # blur the mask to help remove noise
+    skinMask = cv2.GaussianBlur(skinMask, (17, 17), 0)
+    # skinMask = cv2.blur(skinMask, (2, 2))
+
+    # get threshold image
+    ret, thresh1 = cv2.threshold(
+        skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    # cv2.imshow("thresh", thresh1)
     # Show hand
     cv2.imshow('Hand threshold', thresh1)
-    if capture:
-        cv2.imwrite(os.path.join(path, f'{index}.jpg'), thresh1)
-        print(index)
-        index = index + 1
+    # if capture:
+    #     cv2.imwrite(os.path.join(path, f'{index}.jpg'), thresh1)
+    #     print(index)
+    #     index = index + 1
     return thresh1
 
 
@@ -278,10 +294,18 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 1):
         operation = int(result[0])
-        if operation == 2:
+        if operation == 6:
             operationStr = "+"
-        else:
-            operationStr = "None"
+        elif operation == 7:
+            operationStr = "-"
+        elif operation == 8:
+            operationStr = "*"
+        elif operation == 9:
+            operationStr = "/"
+        elif operation == 10:
+            operationStr = "^"
+        else:  # default
+            operationStr = "+"
         cv2.putText(img, f'{operand1} {operationStr}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 2):
@@ -290,9 +314,20 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 3):
         # print("count = 3")
-        if(operation == 2):
+        if(operation == 6):
             finalResult = operand1 + operand2
-            print("finalResult = ", finalResult)
+        elif operation == 7:
+            finalResult = operand1 - operand2
+        elif operation == 8:
+            finalResult = operand1 * operand2
+        elif operation == 9:
+            finalResult = operand1 / operand2
+        elif operation == 10:
+            finalResult = operand1 ** operand2
+        else:  # default
+            finalResult = operand1 + operand2
+
+        print("finalResult = ", finalResult)
         cv2.putText(img, f'{operand1} {operationStr} {operand2} = {finalResult}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 4):
