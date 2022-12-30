@@ -76,14 +76,14 @@ def show_images(images, titles=None):
 
 
 # Position of ROI of hand thresholding
-top, right, bottom, left = 350, 690, 565, 930
+top, right, bottom, left = 350, 490, 565, 730
 # Change the resolution of video
 # cap = cv2.VideoCapture(0,  apiPreference=cv2.CAP_ANY, params=[
 #     cv2.CAP_PROP_FRAME_WIDTH, 1024,
 #     cv2.CAP_PROP_FRAME_HEIGHT, 768])
 cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
-index = 450
+index = 751
 capture = False
 path = "E:/Koleya/3rd/image project last/captured/giza"
 
@@ -121,7 +121,8 @@ def getThresholdedHand(frame, roi):
     # get threshold image
     ret, thresh1 = cv2.threshold(
         skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    # cv2.imshow("thresh", thresh1)
+    # thresh1 = cv2.adaptiveThreshold(
+    #     skinMask, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 5)
     # Show hand
     cv2.imshow('Hand threshold', thresh1)
     # if capture:
