@@ -76,16 +76,16 @@ def show_images(images, titles=None):
 
 
 # Position of ROI of hand thresholding
-top, right, bottom, left = 350, 690, 565, 930
+top, right, bottom, left = 350, 490, 565, 730
 # Change the resolution of video
 # cap = cv2.VideoCapture(0,  apiPreference=cv2.CAP_ANY, params=[
 #     cv2.CAP_PROP_FRAME_WIDTH, 1024,
 #     cv2.CAP_PROP_FRAME_HEIGHT, 768])
 cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
-index = 501
+index = 751
 capture = False
-path = "D:/Engineering/CUFE/3rd Year (Computer) (2022)/First Semester/Image Processing/Projects/captured/test/"
+path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/data set/2"
 
 
 def getThresholdedHand(frame, roi):
@@ -119,8 +119,10 @@ def getThresholdedHand(frame, roi):
     # skinMask = cv2.blur(skinMask, (2, 2))
 
     # get threshold image
-    ret, thresh1 = cv2.threshold(
-        skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    # ret, thresh1 = cv2.threshold(
+    #     skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    thresh1 = cv2.adaptiveThreshold(
+        skinMask, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 5)
     # cv2.imshow("thresh", thresh1)
     # Show hand
     cv2.imshow('Hand threshold', thresh1)
