@@ -110,7 +110,7 @@ def getThresholdedHand(frame, roi):
     # to be considered 'skin'
     hsvim = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
     lower = np.array([0, 48, 80], dtype="uint8")
-    upper = np.array([20, 180, 230], dtype="uint8")
+    upper = np.array([20, 255, 255], dtype="uint8")
     skinMask = cv2.inRange(hsvim, lower, upper)
 
     # blur the mask to help remove noise
