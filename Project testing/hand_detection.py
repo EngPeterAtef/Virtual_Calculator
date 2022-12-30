@@ -125,10 +125,10 @@ def getThresholdedHand(frame, roi):
     # cv2.imshow("thresh", thresh1)
     # Show hand
     cv2.imshow('Hand threshold', thresh1)
-    # if capture:
-    #     cv2.imwrite(os.path.join(path, f'{index}.jpg'), thresh1)
-    #     print(index)
-    #     index = index + 1
+    if capture:
+        cv2.imwrite(os.path.join(path, f'{index}.jpg'), thresh1)
+        print(index)
+        index = index + 1
     return thresh1
 
 
