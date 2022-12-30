@@ -104,8 +104,7 @@ def getThresholdedHand(frame, roi):
     # Threshold
     # et, thresh1 = cv2.threshold(
     #     roi, 127, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    # thresh1 = cv2.adaptiveThreshold(
-    #     roi, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 5)
+    
 
     # define the upper and lower boundaries of the HSV pixel intensities
     # to be considered 'skin'
@@ -119,10 +118,11 @@ def getThresholdedHand(frame, roi):
     # skinMask = cv2.blur(skinMask, (2, 2))
 
     # get threshold image
-    ret, thresh1 = cv2.threshold(
-        skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    # thresh1 = cv2.adaptiveThreshold(
-    #     skinMask, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 5)
+    # ret, thresh1 = cv2.threshold(
+        # skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    thresh1 = cv2.adaptiveThreshold(
+        skinMask, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 355, 5)
+    # cv2.imshow("thresh", thresh1)
     # Show hand
     cv2.imshow('Hand threshold', thresh1)
     # if capture:
