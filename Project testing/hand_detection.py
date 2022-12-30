@@ -98,19 +98,30 @@ def getThresholdedHand(frame, roi):
     #     cv2.imwrite(os.path.join(path, f'{index}.jpg'), roi2)
     #     print(index)
     #     index = index + 1
-    roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    # roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
     # Gaussiam filter
-    roi = cv2.GaussianBlur(roi, (17, 17), 0)
+    # roi = cv2.GaussianBlur(roi, (17, 17), 0)
     # Threshold
     # et, thresh1 = cv2.threshold(
     #     roi, 127, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    thresh1 = cv2.adaptiveThreshold(
-        roi, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 5)
-    # -------------Skeletonize------------
-    # thresh1 = skeletonize(thresh1/255)
-    # ---------------erosion--------------
-    # erosion = binary_erosion(thresh1, structure_element)
-    # thresh1 = thresh1 - erosion.astype(np.uint8) * 255
+    # thresh1 = cv2.adaptiveThreshold(
+    #     roi, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 199, 5)
+
+    # define the upper and lower boundaries of the HSV pixel intensities
+    # to be considered 'skin'
+    hsvim = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+    lower = np.array([0, 48, 80], dtype="uint8")
+    upper = np.array([20, 180, 230], dtype="uint8")
+    skinMask = cv2.inRange(hsvim, lower, upper)
+
+    # blur the mask to help remove noise
+    skinMask = cv2.GaussianBlur(skinMask, (17, 17), 0)
+    # skinMask = cv2.blur(skinMask, (2, 2))
+
+    # get threshold image
+    ret, thresh1 = cv2.threshold(
+        skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    # cv2.imshow("thresh", thresh1)
     # Show hand
     cv2.imshow('Hand threshold', thresh1)
     # if capture:
