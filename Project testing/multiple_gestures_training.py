@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn import cluster
 import pickle
-path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/Virtual_Keyboard/data set/"
+path = "E:/Koleya/3rd/image project last/captured/"
 img = cv.imread(path + '0/1.jpg')
 sift = cv.SIFT_create()
 kp, descriptor = sift.detectAndCompute(img, None)
