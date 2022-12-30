@@ -85,7 +85,7 @@ cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
 index = 751
 capture = False
-path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/data set/2"
+path = "E:/Koleya/3rd/image project last/captured/giza"
 
 
 def getThresholdedHand(frame, roi):
