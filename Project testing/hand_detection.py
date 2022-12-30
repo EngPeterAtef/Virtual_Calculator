@@ -14,6 +14,9 @@ import pandas as pd
 import pickle
 import os
 import threading
+from skimage.exposure import histogram
+from matplotlib.pyplot import bar
+
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -88,12 +91,23 @@ capture = False
 path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/Virtual_Keyboard/data set/"
 
 
+def showHist(img):
+    # An "interface" to matplotlib.axes.Axes.hist() method
+    plt.figure()
+    imgHist = histogram(img, nbins=256)
+
+    bar(imgHist[1].astype(np.uint8), imgHist[0], width=0.8, align='center')
+
+
 def getThresholdedHand(frame, roi):
     global top, right, bottom, left, index, capture
     # Draw rectangle to indicate the area in which we initialize hand positon for the first time
     cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
     # Convert to gray scale
     roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    # show_images([roi], ["roi"])
+    showHist(roi)
+
     # Gaussiam filter
     roi = cv2.GaussianBlur(roi, (17, 17), 0)
     # Threshold
@@ -192,7 +206,9 @@ timer.start()
 # ----------------MAIN LOOP---------------
 # ----------------------------------------
 print("Running for : %s seconds" % (time.time()-start_time))
-while True:
+flag = True
+
+while flag:
 
     # READ FRAME
     success, img = cap.read()
@@ -229,6 +245,7 @@ while True:
     # ----------------------------------------------------
     # Region of interest to be used for hand thresholding
     roiForHandThresholding = img[top:bottom, right:left]
+
     thres = getThresholdedHand(img, roiForHandThresholding)
     # ----------------------------------------------------
     # ----------------GESTURE PREDICTION------------------
@@ -288,7 +305,7 @@ while True:
             operationStr = "/"
         elif operation == 10:
             operationStr = "^"
-        else:#default
+        else:  # default
             operationStr = "+"
         cv2.putText(img, f'{operand1} {operationStr}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
@@ -308,7 +325,7 @@ while True:
             finalResult = operand1 / operand2
         elif operation == 10:
             finalResult = operand1 ** operand2
-        else:#default
+        else:  # default
             finalResult = operand1 + operand2
 
         print("finalResult = ", finalResult)
@@ -334,3 +351,4 @@ while True:
         # break
     if cv2.waitKey(1) & 0xff == 27:
         break
+    flag = False
