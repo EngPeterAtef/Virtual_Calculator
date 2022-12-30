@@ -14,9 +14,6 @@ import pandas as pd
 import pickle
 import os
 import threading
-from skimage.exposure import histogram
-from matplotlib.pyplot import bar
-
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -79,7 +76,7 @@ def show_images(images, titles=None):
 
 
 # Position of ROI of hand thresholding
-top, right, bottom, left = 350, 90, 565, 330
+top, right, bottom, left = 350, 690, 565, 930
 # Change the resolution of video
 # cap = cv2.VideoCapture(0,  apiPreference=cv2.CAP_ANY, params=[
 #     cv2.CAP_PROP_FRAME_WIDTH, 1024,
@@ -88,15 +85,7 @@ cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
 index = 501
 capture = False
-path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/Virtual_Keyboard/data set/"
-
-
-def showHist(img):
-    # An "interface" to matplotlib.axes.Axes.hist() method
-    plt.figure()
-    imgHist = histogram(img, nbins=256)
-
-    bar(imgHist[1].astype(np.uint8), imgHist[0], width=0.8, align='center')
+path = "D:/Engineering/CUFE/3rd Year (Computer) (2022)/First Semester/Image Processing/Projects/captured/test/"
 
 
 def getThresholdedHand(frame, roi):
@@ -104,10 +93,12 @@ def getThresholdedHand(frame, roi):
     # Draw rectangle to indicate the area in which we initialize hand positon for the first time
     cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
     # Convert to gray scale
+    # roi2 = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+    # if capture:
+    #     cv2.imwrite(os.path.join(path, f'{index}.jpg'), roi2)
+    #     print(index)
+    #     index = index + 1
     roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-    # show_images([roi], ["roi"])
-    showHist(roi)
-
     # Gaussiam filter
     roi = cv2.GaussianBlur(roi, (17, 17), 0)
     # Threshold
@@ -122,10 +113,10 @@ def getThresholdedHand(frame, roi):
     # thresh1 = thresh1 - erosion.astype(np.uint8) * 255
     # Show hand
     cv2.imshow('Hand threshold', thresh1)
-    if capture:
-        cv2.imwrite(os.path.join(path, f'{index}.jpg'), thresh1)
-        print(index)
-        index = index + 1
+    # if capture:
+    #     cv2.imwrite(os.path.join(path, f'{index}.jpg'), thresh1)
+    #     print(index)
+    #     index = index + 1
     return thresh1
 
 
@@ -206,9 +197,7 @@ timer.start()
 # ----------------MAIN LOOP---------------
 # ----------------------------------------
 print("Running for : %s seconds" % (time.time()-start_time))
-flag = True
-
-while flag:
+while True:
 
     # READ FRAME
     success, img = cap.read()
@@ -245,7 +234,6 @@ while flag:
     # ----------------------------------------------------
     # Region of interest to be used for hand thresholding
     roiForHandThresholding = img[top:bottom, right:left]
-
     thres = getThresholdedHand(img, roiForHandThresholding)
     # ----------------------------------------------------
     # ----------------GESTURE PREDICTION------------------
@@ -351,4 +339,3 @@ while flag:
         # break
     if cv2.waitKey(1) & 0xff == 27:
         break
-    flag = False
