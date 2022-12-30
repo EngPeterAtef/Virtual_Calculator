@@ -325,8 +325,8 @@ while True:
             finalResult = operand1 / operand2
         elif operation == 10:
             finalResult = operand1 ** operand2
-        else:  # default
-            finalResult = operand1 + operand2
+        # else:  # default
+        #     finalResult = operand1 + operand2
 
         print("finalResult = ", finalResult)
         cv2.putText(img, f'{operand1} {operationStr} {operand2} = {finalResult}', (40, 80),
