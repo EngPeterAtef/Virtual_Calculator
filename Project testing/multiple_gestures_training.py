@@ -1,7 +1,6 @@
 
 import numpy as np
 import cv2 as cv
-import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn import cluster
 import pickle
@@ -23,10 +22,6 @@ for g in range(0, 11):
     for i in range(c, 1251):
         # Read image
         img = cv.imread(path + f'{g}/{i}.jpg')
-        # Grayscale
-        # gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        # Binary
-        # et, thresh1 = cv.threshold(gray, 127, 255, cv.THRESH_BINARY_INV+cv.THRESH_OTSU)
         # Initialize sift
         sift = cv.SIFT_create()
         # Keypoints, descriptors
@@ -61,11 +56,6 @@ print(f"Training SVM model...")
 # Train the SVM multiclass classification model
 clf = svm.SVC(decision_function_shape='ovo')
 clf.fit(bagOfWords, y)
-# dec = clf.decision_function([[1]])
-# dec.shape[1] # 4 classes: 4*3/2 = 6
-# clf.decision_function_shape = "ovr"
-# dec = clf.decision_function([[1]])
-# dec.shape[1] # 4 classes
 print(f"Success")
 print(f"Saving models")
 
