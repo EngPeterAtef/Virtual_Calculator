@@ -8,7 +8,7 @@ import threading
 operand1 = operation = operand2 = timer = None
 inputsCount = 0
 finalResult = 0
-maxTime = 15
+maxTime = 10
 
 
 def fun():
@@ -39,6 +39,23 @@ cap = cv2.VideoCapture(0)
 index = 751
 capture = False
 path = "E:/Koleya/3rd/image project last/captured/giza"
+# operationsArr = np.array([])
+
+
+def getOperationString(operation):
+    if operation == 6:
+        operationStr = "+"
+    elif operation == 7:
+        operationStr = "-"
+    elif operation == 8:
+        operationStr = "*"
+    elif operation == 9:
+        operationStr = "/"
+    elif operation == 10:
+        operationStr = "^"
+    else:  # default
+        operationStr = ""
+    return operationStr
 
 
 def getThresholdedHand(frame, roi):
@@ -87,6 +104,8 @@ print("Success")
 timer = threading.Timer(maxTime, fun)
 start_time = time.time()
 timer.start()
+
+operand1Arr = np.array([])
 # ----------------------------------------
 # ----------------MAIN LOOP---------------
 # ----------------------------------------
@@ -96,8 +115,10 @@ while True:
     success, img = cap.read()
     img = cv2.resize(img, (1000, 600))
     img = cv2.flip(img, 1)
-    # TRANSFORM TO RGB
-    imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    # ---------------------------DRAW TIMER--------------------------------
+    cv2.rectangle(img, (770, 5), (995, 100), (175, 0, 175), cv2.FILLED)
+    cv2.putText(img, f'{int(time.time() - start_time)}/{maxTime}', (800, 80),
+                cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     # ----------------------------------------------------
     # ---------------HANDS THRSHOLDING--------------------
     # ----------------------------------------------------
@@ -111,8 +132,7 @@ while True:
     sift = cv2.SIFT_create()
     kp, descriptor = sift.detectAndCompute(thres, None)
     if descriptor is None:
-        cv2.putText(img, f'{int(time.time() - start_time)}/{maxTime}', (700, 80),
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
+        cv2.rectangle(img, (5, 5), (500, 100), (175, 0, 175), cv2.FILLED)
         cv2.imshow('Hand Tracker', img)
         if cv2.waitKey(1) & 0xff == 27:
             break
@@ -125,36 +145,48 @@ while True:
             vq[feature] = vq[feature] + 1  # load the model from disk
         # Predict the result
         result = clf.predict([vq])
-    # ---------------------------DRAW TIMER--------------------------------
-    cv2.putText(img, f'{int(time.time() - start_time)}/{maxTime}', (700, 80),
-                cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
+
     # ---------------------DRAW GESTURE PREDICTION-------------------------
+    cv2.rectangle(img, (5, 5), (500, 100), (175, 0, 175), cv2.FILLED)
     if(inputsCount == 0):
+        # Reset operation
+        operationsArr = np.array([])
+        # Set operand 1
         operand1 = int(result[0])
+        operand1Arr = np.append(operand1Arr, operand1)
         cv2.putText(img, f'{operand1}', (40, 80),
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     elif(inputsCount == 1):
+        # Calculate average operand 1
+        operand1Count = np.bincount(operand1Arr.astype(int))
+        maxOperand1Count = np.argmax(operand1Count)
+        operand1 = maxOperand1Count
+        # Reset operand 2
+        operand2Arr = np.array([])
+        # Set operation
         operation = int(result[0])
-        if operation == 6:
-            operationStr = "+"
-        elif operation == 7:
-            operationStr = "-"
-        elif operation == 8:
-            operationStr = "*"
-        elif operation == 9:
-            operationStr = "/"
-        elif operation == 10:
-            operationStr = "^"
-        else:  # default
-            operationStr = "+"
+        operationsArr = np.append(operationsArr, operation)
+        operationStr = getOperationString(operation)
         cv2.putText(img, f'{operand1} {operationStr}', (40, 80),
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     elif(inputsCount == 2):
+        # Calculate average operation
+        operationsCount = np.bincount(operationsArr.astype(int))
+        maxOperationsCount = np.argmax(operationsCount)
+        operation = maxOperationsCount
+        operationStr = getOperationString(operation)
+        # Reset operand 1
+        operand1Arr = np.array([])
+        # Set operand 2
         operand2 = int(result[0])
+        operand2Arr = np.append(operand2Arr, operand2)
         cv2.putText(img, f'{operand1} {operationStr} {operand2}', (40, 80),
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     elif(inputsCount == 3):
-        # print("count = 3")
+        # Calculate average operand 2
+        operand2Count = np.bincount(operand2Arr.astype(int))
+        maxOperand2Count = np.argmax(operand2Count)
+        operand2 = maxOperand2Count
         if operation == 6:
             finalResult = operand1 + operand2
         elif operation == 7:
@@ -170,16 +202,16 @@ while True:
 
         # print("finalResult = ", finalResult)
         cv2.putText(img, f'{operand1} {operationStr} {operand2} = {finalResult}', (40, 80),
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     elif(inputsCount == 4):
         cv2.putText(img, f'{operand1} {operationStr} {operand2} = {finalResult}', (40, 80),
-                    cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     # cv2.putText(img, f'{result[0]}', (40, 80),
     #             cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 255), 6)
     # cv2.putText(img, f'finalResult =  {finalResult}', (60, 100), cv2.FONT_HERSHEY_SIMPLEX,3, (0, 0, 255), 6)
 
     # ----------Draw rectangle that contains the output word---------
-    # cv2.rectangle(img, (50, 450), (600, 550), (175, 0, 175), cv2.FILLED)
+    # cv2.rectangle(img, (0, 0), (350, 100), (175, 0, 175), cv2.FILLED)
     # cv2.putText(img, finalText, (60, 500),
     #             cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 255), 3)
 
