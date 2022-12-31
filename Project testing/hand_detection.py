@@ -12,11 +12,12 @@ maxTime = 10
 
 
 def fun():
-    print("callback func")
+    # print("callback func")
     global operand1, operation, operand2, timer, inputsCount, result, finalResult, start_time
+    # print(f"{inputsCount}")
     inputsCount = inputsCount + 1
-    print(
-        f"operand1= {operand1}, operation = {operation}, operand2 = {operand2}")
+    # print(
+    #     f"operand1= {operand1}, operation = {operation}, operand2 = {operand2}")
     if(inputsCount < 4):
         timer = threading.Timer(maxTime, fun)
         start_time = time.time()
@@ -155,15 +156,18 @@ while True:
         operationsArr = np.array([])
         # Set operand 1
         operand1 = int(result[0])
-        if int(time.time() - start_time) >= maxTime//2:
+        if int(time.time() - start_time) >= maxTime // 2:
             operand1Arr = np.append(operand1Arr, operand1)
         cv2.putText(img, f'{operand1}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     elif(inputsCount == 1):
         # Calculate average operand 1
-        operand1Count = np.bincount(operand1Arr.astype(int))
-        maxOperand1Count = np.argmax(operand1Count)
-        operand1 = maxOperand1Count
+        if operand1Arr.size > 0:
+            operand1Count = np.bincount(operand1Arr.astype(int))
+            maxOperand1Count = np.argmax(operand1Count)
+            operand1 = maxOperand1Count
+        else:
+            operand1 = 0
         # Reset operand 2
         operand2Arr = np.array([])
         # Set operation
@@ -175,10 +179,14 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     elif(inputsCount == 2):
         # Calculate average operation
-        operationsCount = np.bincount(operationsArr.astype(int))
-        maxOperationsCount = np.argmax(operationsCount)
-        operation = maxOperationsCount
-        operationStr = getOperationString(operation)
+        if operationsArr.size > 0:
+            operationsCount = np.bincount(operationsArr.astype(int))
+            maxOperationsCount = np.argmax(operationsCount)
+            operation = maxOperationsCount
+            operationStr = getOperationString(operation)
+        else:
+            operation = 6
+            operationStr = getOperationString(operation)
         # Reset operand 1
         operand1Arr = np.array([])
         # Set operand 2
@@ -189,9 +197,12 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     elif(inputsCount == 3):
         # Calculate average operand 2
-        operand2Count = np.bincount(operand2Arr.astype(int))
-        maxOperand2Count = np.argmax(operand2Count)
-        operand2 = maxOperand2Count
+        if operand2Arr.size > 0:
+            operand2Count = np.bincount(operand2Arr.astype(int))
+            maxOperand2Count = np.argmax(operand2Count)
+            operand2 = maxOperand2Count
+        else:
+            operand2 = 0
         if operation == 6:
             finalResult = operand1 + operand2
         elif operation == 7:
@@ -225,6 +236,5 @@ while True:
     # cv2.waitKey(1)
     if cv2.waitKey(1) & 0xff == ord('s'):
         capture = True
-        # break
     if cv2.waitKey(1) & 0xff == 27:
         break
