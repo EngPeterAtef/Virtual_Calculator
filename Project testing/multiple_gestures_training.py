@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn import svm
 from sklearn import cluster
 import pickle
-path = "E:/Koleya/3rd/image project last/captured/"
+path = "D:/Engineering/CUFE/3rd Year (Computer) (2022)/First Semester/Image Processing/Projects/data set/data set/"
 img = cv.imread(path + '0/1.jpg')
 sift = cv.SIFT_create()
 kp, descriptor = sift.detectAndCompute(img, None)
@@ -15,12 +15,12 @@ descriptors.append(descriptor)
 bagOfWords = []
 y = []
 y.append(1)
-for g in range(0,11):
-    if g==0:
+for g in range(0, 11):
+    if g == 0:
         c = 2
     else:
-        c=1
-    for i in range(c, 751):
+        c = 1
+    for i in range(c, 1251):
         # Read image
         img = cv.imread(path + f'{g}/{i}.jpg')
         # Grayscale

@@ -104,7 +104,6 @@ def getThresholdedHand(frame, roi):
     # Threshold
     # et, thresh1 = cv2.threshold(
     #     roi, 127, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    
 
     # define the upper and lower boundaries of the HSV pixel intensities
     # to be considered 'skin'
@@ -119,7 +118,7 @@ def getThresholdedHand(frame, roi):
 
     # get threshold image
     # ret, thresh1 = cv2.threshold(
-        # skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    # skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     thresh1 = cv2.adaptiveThreshold(
         skinMask, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 355, 5)
     # cv2.imshow("thresh", thresh1)
@@ -186,20 +185,20 @@ n_clusters = 1600
 filename2 = 'gestures_model.sav'
 clf = pickle.load(open(filename2, 'rb'))
 # ----------------------MEAN SHIFT INITIALIZATION--------------------
-# take first frame of the video
-ret, frame = cap.read()
-# setup initial location of window
-x, y, w, h = 0, 0, 300, 400  # simply hardcoded the values
-track_window = (x, y, w, h)
-# set up the ROI for tracking in MeanShift
-roi = frame[y:y+h, x:x+w]
-hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-mask = cv2.inRange(hsv_roi, np.array((0., 60., 32.)),
-                   np.array((180., 255., 255.)))
-roi_hist = cv2.calcHist([hsv_roi], [0], mask, [180], [0, 180])
-cv2.normalize(roi_hist, roi_hist, 0, 255, cv2.NORM_MINMAX)
-# Setup the termination criteria, either 10 iteration or move by at least 1 pt
-term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
+# # take first frame of the video
+# ret, frame = cap.read()
+# # setup initial location of window
+# x, y, w, h = 0, 0, 300, 400  # simply hardcoded the values
+# track_window = (x, y, w, h)
+# # set up the ROI for tracking in MeanShift
+# roi = frame[y:y+h, x:x+w]
+# hsv_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+# mask = cv2.inRange(hsv_roi, np.array((0., 60., 32.)),
+#                    np.array((180., 255., 255.)))
+# roi_hist = cv2.calcHist([hsv_roi], [0], mask, [180], [0, 180])
+# cv2.normalize(roi_hist, roi_hist, 0, 255, cv2.NORM_MINMAX)
+# # Setup the termination criteria, either 10 iteration or move by at least 1 pt
+# term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
 
 
 timer = threading.Timer(10, fun)
@@ -325,10 +324,10 @@ while True:
             finalResult = operand1 / operand2
         elif operation == 10:
             finalResult = operand1 ** operand2
-        # else:  # default
-        #     finalResult = operand1 + operand2
+        else:  # default
+            finalResult = operand1 + operand2
 
-        print("finalResult = ", finalResult)
+        # print("finalResult = ", finalResult)
         cv2.putText(img, f'{operand1} {operationStr} {operand2} = {finalResult}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 4):
