@@ -1,6 +1,8 @@
-import cv2 as cv
+import cv2
 import pickle
-path = "E:/Koleya/3rd/image project last/captured/2/"
+import numpy as np
+
+path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/data set/"
 # Load kmeans model
 filename1 = 'kmeans_model.sav'
 k_means = pickle.load(open(filename1, 'rb'))
@@ -8,14 +10,26 @@ k_means = pickle.load(open(filename1, 'rb'))
 filename2 = 'gestures_model.sav'
 clf = pickle.load(open(filename2, 'rb'))
 # Read image
-img = cv.imread(path + '11.jpg')
-# # Gray
-# img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-# # Binary
-# et, img = cv.threshold(img, 127, 255, cv.THRESH_BINARY_INV+cv.THRESH_OTSU)
+img = cv2.imread(path + '2018.jpg')
+
+hsvim = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+# Lower boundary of skin color in HSV
+lower = np.array([0, 48, 80], dtype="uint8")
+# Upper boundary of skin color in HSV
+upper = np.array([20, 255, 255], dtype="uint8")
+skinMask = cv2.inRange(hsvim, lower, upper)
+
+# Gaussian filter (blur) to remove noise
+skinMask = cv2.GaussianBlur(skinMask, (17, 17), 0)
+
+# get thresholded image
+# ret, thresh1 = cv2.threshold(
+# skinMask, 100, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+thresh1 = cv2.adaptiveThreshold(
+    skinMask, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 355, 5)
 # Feature extraction
-sift = cv.SIFT_create()
-kp, descriptor = sift.detectAndCompute(img, None)
+sift = cv2.SIFT_create()
+kp, descriptor = sift.detectAndCompute(thresh1, None)
 # Produce "bag of words" vector
 descriptor = k_means.predict(descriptor)
 n_clusters = 1600
@@ -24,4 +38,4 @@ for feature in descriptor:
     vq[feature] = vq[feature] + 1  # load the model from disk
 # Predict the result
 result = clf.predict([vq])
-print(result)
+print("the result is ", result[0])
