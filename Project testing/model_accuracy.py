@@ -15,9 +15,9 @@ clf = pickle.load(open(filename2, 'rb'))
 print("Success")
 y_true = []
 y_predict = []
-path = "D:/Engineering/CUFE/3rd Year (Computer) (2022)/First Semester/Image Processing/Projects/data set/data set/"
-for g in range(0, 2):
-    for i in range(1001, 1251):
+path = "D:/Engineering/CUFE/3rd Year (Computer) (2022)/First Semester/Image Processing/Projects/data set/data2/"
+for g in range(0, 11):
+    for i in range(1251, 1501):
         # Read image
         img = cv2.imread(path + f'{g}/{i}.jpg')
         # Feature extraction
@@ -33,4 +33,4 @@ for g in range(0, 2):
         # Predict the result
         y_predict.append(clf.predict([vq]))
 accuracy = accuracy_score(y_true, y_predict)
-print(accuracy)
+print(f"Accuracy: {accuracy}")
