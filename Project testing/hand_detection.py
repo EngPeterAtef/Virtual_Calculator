@@ -5,9 +5,9 @@ import pickle
 import os
 import threading
 
-operand1 = operation = operand2 = timer = None
+operand1 = operation = operand2 = timer = operationStr = "?"
 inputsCount = 0
-finalResult = 0
+finalResult = "?"
 maxTime = 10
 
 
@@ -54,7 +54,7 @@ def getOperationString(operation):
     elif operation == 10:
         operationStr = "^"
     else:  # default
-        operationStr = ""
+        operationStr = "?"
     return operationStr
 
 
@@ -133,6 +133,8 @@ while True:
     kp, descriptor = sift.detectAndCompute(thres, None)
     if descriptor is None:
         cv2.rectangle(img, (5, 5), (500, 100), (175, 0, 175), cv2.FILLED)
+        cv2.putText(img, f'{operand1} {operationStr} {operand2} = {finalResult}', (40, 80),
+                    cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
         cv2.imshow('Hand Tracker', img)
         if cv2.waitKey(1) & 0xff == 27:
             break
@@ -153,7 +155,8 @@ while True:
         operationsArr = np.array([])
         # Set operand 1
         operand1 = int(result[0])
-        operand1Arr = np.append(operand1Arr, operand1)
+        if int(time.time() - start_time) >= maxTime//2:
+            operand1Arr = np.append(operand1Arr, operand1)
         cv2.putText(img, f'{operand1}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     elif(inputsCount == 1):
@@ -165,7 +168,8 @@ while True:
         operand2Arr = np.array([])
         # Set operation
         operation = int(result[0])
-        operationsArr = np.append(operationsArr, operation)
+        if int(time.time() - start_time) >= maxTime // 2:
+            operationsArr = np.append(operationsArr, operation)
         operationStr = getOperationString(operation)
         cv2.putText(img, f'{operand1} {operationStr}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
@@ -179,7 +183,8 @@ while True:
         operand1Arr = np.array([])
         # Set operand 2
         operand2 = int(result[0])
-        operand2Arr = np.append(operand2Arr, operand2)
+        if int(time.time() - start_time) >= maxTime // 2:
+            operand2Arr = np.append(operand2Arr, operand2)
         cv2.putText(img, f'{operand1} {operationStr} {operand2}', (40, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 6)
     elif(inputsCount == 3):
