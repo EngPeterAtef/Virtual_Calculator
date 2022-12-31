@@ -8,6 +8,7 @@ import threading
 operand1 = operation = operand2 = timer = None
 inputsCount = 0
 finalResult = 0
+maxTime = 15
 
 
 def fun():
@@ -17,14 +18,14 @@ def fun():
     print(
         f"operand1= {operand1}, operation = {operation}, operand2 = {operand2}")
     if(inputsCount < 4):
-        timer = threading.Timer(10, fun)
+        timer = threading.Timer(maxTime, fun)
         start_time = time.time()
         timer.start()
         # print ("Running for : %s seconds"%(time.time()-start_time))
         print("after calling start_time.start()")
     if(inputsCount == 4):
         inputsCount = 0
-        timer = threading.Timer(10, fun)
+        timer = threading.Timer(maxTime, fun)
         start_time = time.time()
         timer.start()
         # print ("Running for : %s seconds"%(time.time()-start_time))
@@ -83,7 +84,7 @@ filename2 = 'gestures_model.sav'
 clf = pickle.load(open(filename2, 'rb'))
 print("Success")
 
-timer = threading.Timer(10, fun)
+timer = threading.Timer(maxTime, fun)
 start_time = time.time()
 timer.start()
 # ----------------------------------------
@@ -110,9 +111,11 @@ while True:
     sift = cv2.SIFT_create()
     kp, descriptor = sift.detectAndCompute(thres, None)
     if descriptor is None:
-        cv2.putText(img, f'{int(time.time() - start_time)}/10', (700, 80),
+        cv2.putText(img, f'{int(time.time() - start_time)}/{maxTime}', (700, 80),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
         cv2.imshow('Hand Tracker', img)
+        if cv2.waitKey(1) & 0xff == 27:
+            break
         continue
     else:
         # Produce "bag of words" vector
@@ -123,7 +126,7 @@ while True:
         # Predict the result
         result = clf.predict([vq])
     # ---------------------------DRAW TIMER--------------------------------
-    cv2.putText(img, f'{int(time.time() - start_time)}/10', (700, 80),
+    cv2.putText(img, f'{int(time.time() - start_time)}/{maxTime}', (700, 80),
                 cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     # ---------------------DRAW GESTURE PREDICTION-------------------------
     if(inputsCount == 0):
@@ -152,7 +155,7 @@ while True:
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
     elif(inputsCount == 3):
         # print("count = 3")
-        if(operation == 6):
+        if operation == 6:
             finalResult = operand1 + operand2
         elif operation == 7:
             finalResult = operand1 - operand2
