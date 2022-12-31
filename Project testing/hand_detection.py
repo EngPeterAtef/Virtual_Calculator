@@ -37,9 +37,9 @@ def fun():
 top, right, bottom, left = 350, 490, 565, 730
 cap = cv2.VideoCapture(0)
 # --------------------Capture dataset---------------------
-index = 751
+index = 1251
 capture = False
-path = "E:/Koleya/3rd/image project last/captured/giza"
+path = "D:/CMP/third_Year/first_Semester/imageProcessing and computerVision/Project/data set/10"
 # operationsArr = np.array([])
 
 
@@ -82,10 +82,10 @@ def getThresholdedHand(frame, roi):
     # Show thresholded hand
     cv2.imshow('Hand threshold', thresh1)
     # Capture dataset
-    if capture:
-        cv2.imwrite(os.path.join(path, f'{index}.jpg'), thresh1)
-        print(index)
-        index = index + 1
+    # if capture:
+    #     cv2.imwrite(os.path.join(path, f'{index}.jpg'), thresh1)
+    #     print(index)
+    #     index = index + 1
     return thresh1
 
 
