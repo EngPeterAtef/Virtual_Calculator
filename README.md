@@ -4,14 +4,14 @@ An augmented reality project using image processing and machine learning
 ### Demo Link <a href="https://youtu.be/EqCD2lAiloM">Link</a> <br/>
 
 ### Libraries:
-1. time <br/>
-2.numpy <br/>
-3.cv2 <br/>
-4.pickle<br/>
-5.os<br/>
-6.threading<br/>
-7.sklearn.metrics<br/>
-8.sklearn<br/>
+1. time
+2. numpy <br/>
+3. cv2 <br/>
+4. pickle<br/>
+5. os<br/>
+6. threading<br/>
+7. sklearn.metrics<br/>
+8. sklearn<br/>
 
 ### How to run the project:
 1. Place hand_detection.py, gestures_model.sav, kmeans_model.sav in the same folder<br/>
